@@ -6,9 +6,11 @@ mongoose.connect("mongodb://localhost:27017/vinted");
 
 app.use(express.json());
 
-const accountRouter = require("./routes/user");
+const userRouter = require("./routes/user");
+const offerRouter = require("./routes/offer");
 
-app.use("/user", accountRouter);
+app.use("/user", userRouter);
+app.use("/offer", offerRouter);
 
 app.all("*", (req, res) => {
   res.status(404).json({ message: "This route doesn't exist" });

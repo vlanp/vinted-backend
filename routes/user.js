@@ -6,10 +6,12 @@ const {
   passwordValidation,
   emailValidation,
   newsletterValidation,
+  pictureValidation,
 } = require("../middlewares/user");
-
+const fileUpload = require("express-fileupload");
 const User = require("../models/User");
 const uid2 = require("uid2");
+const { uploadPicture } = require("../utils/cloudinary");
 
 /**
   @todo Add logic to send an email to verify an email. Here is the steps to do so: 
@@ -22,13 +24,16 @@ const uid2 = require("uid2");
   If the string exists in the database, get the related user and set their active property to true
   Delete the string from the database, it is no longer needed
   Your user is now verified.
+  @todo Handle profile picture
  */
 router.post(
   "/signup",
+  fileUpload(),
   usernameValidation,
   passwordValidation,
   emailValidation,
   newsletterValidation,
+  pictureValidation,
   async (req, res) => {
     try {
       const { username, password, email, newsletter } = req.body;
@@ -59,6 +64,14 @@ router.post(
         salt: salt,
         randomString: randomString,
       });
+
+      const { picture } = req.files;
+
+      if (picture) {
+        const folder = "/vinted/user/" + newUser._id;
+        const pictureDataObj = await uploadPicture(picture, folder);
+        newUser.account.avatar = pictureDataObj;
+      }
 
       await newUser.save();
 
