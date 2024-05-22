@@ -1,107 +1,83 @@
 const express = require("express");
 const router = express.Router();
-const SHA256 = require("crypto-js/sha256");
-const encBase64 = require("crypto-js/enc-base64");
-const uid2 = require("uid2");
+const hashPassword = require("../utils/passwordProtection");
+const {
+  usernameValidation,
+  passwordValidation,
+  emailValidation,
+  newsletterValidation,
+} = require("../middlewares/user");
 
 const User = require("../models/User");
+const uid2 = require("uid2");
 
-router.post("/signup", async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    let { newsletter } = req.body;
+/**
+  @todo Add logic to send an email to verify an email. Here is the steps to do so: 
+  What you're looking for is called "account verification" or "email verification". There are plenty of Node modules that can perform this, but the principle goes like this:
+  Your User model should have an active attribute that is false by default
+  When the user submits a valid signup form, create a new User (who's active will be false initially)
+  Create a long random string (128 characters is usually good) with a crypto library and store it in your database with a reference to the User ID
+  Send an email to the supplied email address with the randomly generated string as part of a link pointing back to a route on your server
+  When a user clicks the link and hits your route, check for the string passed in the URL
+  If the string exists in the database, get the related user and set their active property to true
+  Delete the string from the database, it is no longer needed
+  Your user is now verified.
+ */
+router.post(
+  "/signup",
+  usernameValidation,
+  passwordValidation,
+  emailValidation,
+  newsletterValidation,
+  async (req, res) => {
+    try {
+      const { username, password, email, newsletter } = req.body;
 
-    if (!username) {
-      throw {
-        status: 400,
-        message: "Incorrect username. Please enter an username.",
+      const user = await User.findOne({ email: email });
+
+      if (user) {
+        throw {
+          status: 409,
+          message:
+            "Incorrect email. There is already an account associated to this email.",
+        };
+      }
+
+      const { salt, hash, token } = hashPassword(password);
+
+      const randomString = uid2(128);
+
+      const newUser = new User({
+        email: email,
+        account: {
+          username: username,
+          avatar: null,
+        },
+        newsletter: newsletter,
+        token: token,
+        hash: hash,
+        salt: salt,
+        randomString: randomString,
+      });
+
+      await newUser.save();
+
+      const response = {
+        _id: newUser._id,
+        token: token,
+        account: { username: username },
       };
+
+      res.status(201).json(response);
+    } catch (error) {
+      res
+        .status(error.status || 500)
+        .json({ message: error.message || "Internal server error" });
     }
-
-    if (username.length < 5 || username.length > 16) {
-      throw {
-        status: 406,
-        message:
-          "Incorrect username. Your username must have between 5 and 16 characters.",
-      };
-    }
-
-    if (!email) {
-      throw {
-        status: 400,
-        message: "Incorrect email. Please enter an email.",
-      };
-    }
-
-    if (!email.includes("@")) {
-      throw {
-        status: 406,
-        message: "Incorrect email. Your email should have an @.",
-      };
-    }
-
-    const user = await User.findOne({ email: email });
-
-    if (user) {
-      throw {
-        status: 409,
-        message:
-          "Incorrect email. There is already an account associated to this email.",
-      };
-    }
-
-    if (!password) {
-      throw {
-        status: 400,
-        message: "Incorrect password. Please enter a password.",
-      };
-    }
-
-    if (password.length < 6 || password.length > 30) {
-      throw {
-        status: 406,
-        message:
-          "Incorrect password. Your password must be at least 6 characters long and no more then 30 characters.",
-      };
-    }
-
-    if (newsletter === undefined) {
-      newsletter = false;
-    }
-
-    const salt = uid2(64);
-    const hash = SHA256(password + salt).toString(encBase64);
-    const token = uid2(64);
-
-    const newUser = new User({
-      email: email,
-      account: {
-        username: username,
-        avatar: null,
-      },
-      newsletter: newsletter,
-      token: token,
-      hash: hash,
-      salt: salt,
-    });
-
-    await newUser.save();
-
-    const response = {
-      _id: newUser._id,
-      token: token,
-      account: { username: username },
-    };
-
-    res.status(201).json(response);
-  } catch (error) {
-    res
-      .status(error.status || 500)
-      .json({ message: error.message || "Internal server error" });
   }
-});
+);
 
-router.post("/login", async (req, res) => {
+router.post("/login", emailValidation, passwordValidation, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -116,7 +92,7 @@ router.post("/login", async (req, res) => {
 
     const { token, hash, salt, _id } = user;
 
-    const hashToVerify = SHA256(password + salt).toString(encBase64);
+    const hashToVerify = hashPassword(password, salt).hash;
 
     if (hashToVerify !== hash) {
       throw {

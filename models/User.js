@@ -10,6 +10,11 @@ const User = mongoose.model("User", {
   token: String,
   hash: String,
   salt: String,
+  active: {
+    type: Boolean,
+    default: false, // Permet de gérer la vérification de l'email
+  },
+  randomString: String,
 });
 
 module.exports = User;
