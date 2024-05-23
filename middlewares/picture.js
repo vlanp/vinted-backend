@@ -1,7 +1,7 @@
-const pictureValidation = (req, res, next) => {
+const pictureValidation = (req, res, next, parametersName = "picture") => {
   try {
     if (req.files) {
-      const { picture } = req.files;
+      const picture = req.files[parametersName];
       if (!picture) {
         return next ? next() : true;
       }
@@ -18,7 +18,7 @@ const pictureValidation = (req, res, next) => {
       ? res
           .status(error.status || 500)
           .json({ message: error.message || "Internal server error" })
-      : null;
+      : console.log(error.message);
   }
 };
 

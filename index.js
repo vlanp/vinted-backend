@@ -10,7 +10,7 @@ const userRouter = require("./routes/user");
 const offerRouter = require("./routes/offer");
 
 app.use("/user", userRouter);
-app.use("/offer", offerRouter);
+app.use(offerRouter);
 
 app.all("*", (req, res) => {
   res.status(404).json({ message: "This route doesn't exist" });

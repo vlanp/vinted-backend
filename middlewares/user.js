@@ -19,11 +19,13 @@ const usernameValidation = (req, res, next) => {
       };
     }
 
-    return next();
+    return next ? next() : true;
   } catch (error) {
     res
-      .status(error.status || 500)
-      .json({ message: error.message || "Internal server error" });
+      ? res
+          .status(error.status || 500)
+          .json({ message: error.message || "Internal server error" })
+      : console.log(error.message);
   }
 };
 
@@ -46,11 +48,13 @@ const passwordValidation = (req, res, next) => {
       };
     }
 
-    return next();
+    return next ? next() : true;
   } catch (error) {
     res
-      .status(error.status || 500)
-      .json({ message: error.message || "Internal server error" });
+      ? res
+          .status(error.status || 500)
+          .json({ message: error.message || "Internal server error" })
+      : console.log(error.message);
   }
 };
 
@@ -72,11 +76,13 @@ const emailValidation = (req, res, next) => {
       };
     }
 
-    return next();
+    return next ? next() : true;
   } catch (error) {
     res
-      .status(error.status || 500)
-      .json({ message: error.message || "Internal server error" });
+      ? res
+          .status(error.status || 500)
+          .json({ message: error.message || "Internal server error" })
+      : console.log(error.message);
   }
 };
 
@@ -90,11 +96,13 @@ const newsletterValidation = (req, res, next) => {
       req.body.newsletter = false;
     }
 
-    return next();
+    return next ? next() : true;
   } catch (error) {
     res
-      .status(error.status || 500)
-      .json({ message: error.message || "Internal server error" });
+      ? res
+          .status(error.status || 500)
+          .json({ message: error.message || "Internal server error" })
+      : console.log(error.message);
   }
 };
 
