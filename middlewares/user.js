@@ -11,7 +11,7 @@ const usernameValidation = (req, res, next) => {
       };
     }
 
-    if (username.length < 5 || username.length > 16) {
+    if (username.length < 3 || username.length > 16) {
       throw {
         status: 406,
         message:
@@ -82,7 +82,11 @@ const emailValidation = (req, res, next) => {
 
 const newsletterValidation = (req, res, next) => {
   try {
-    if (req.body.newsletter !== true && req.body.newsletter !== false) {
+    if (req.body.newsletter !== "true" && req.body.newsletter !== "false") {
+      req.body.newsletter = false;
+    } else if (req.body.newsletter === "true") {
+      req.body.newsletter = true;
+    } else {
       req.body.newsletter = false;
     }
 
@@ -94,34 +98,9 @@ const newsletterValidation = (req, res, next) => {
   }
 };
 
-const pictureValidation = (req, res, next) => {
-  try {
-    if (req.files) {
-      const { picture } = req.files;
-      if (!picture) {
-        return next ? next() : true;
-      }
-      if (!picture.mimetype || !picture.data) {
-        req.files.picture = undefined;
-      }
-    } else {
-      req.files = {};
-      req.files.picture = undefined;
-    }
-    return next ? next() : true;
-  } catch (error) {
-    res
-      ? res
-          .status(error.status || 500)
-          .json({ message: error.message || "Internal server error" })
-      : null;
-  }
-};
-
 module.exports = {
   usernameValidation,
   passwordValidation,
   emailValidation,
   newsletterValidation,
-  pictureValidation,
 };

@@ -8,8 +8,8 @@ const {
   titleValidation,
   descriptionValidation,
   priceValidation,
-  pictureValidation,
 } = require("../middlewares/offer");
+const { pictureValidation } = require("../middlewares/picture");
 
 router.post(
   "/publish",
@@ -45,7 +45,7 @@ router.post(
             CITY: city,
           },
         ],
-        owner: req.user._id,
+        owner: req.user,
       });
 
       const { picture } = req.files;
@@ -74,7 +74,7 @@ router.put("/modify/:id", isAuthentificated, fileUpload(), async (req, res) => {
   try {
     const offerId = req.params.id;
 
-    const offer = await Offer.findById(offerId);
+    const offer = await Offer.findById(offerId).populate("owner", "account");
 
     if (!offer) {
       throw {
@@ -83,7 +83,7 @@ router.put("/modify/:id", isAuthentificated, fileUpload(), async (req, res) => {
       };
     }
 
-    if (req.user._id.valueOf() !== offer.owner.valueOf()) {
+    if (req.user._id.valueOf() !== offer.owner._id.valueOf()) {
       throw {
         error: 401,
         message: "You are not the owner of the offer. You can't modify it.",
@@ -116,19 +116,19 @@ router.put("/modify/:id", isAuthentificated, fileUpload(), async (req, res) => {
     }
     offer.product_details = [
       {
-        BRAND: brand ? brand : offer.product_details.brand,
+        BRAND: brand ? brand : offer.product_details[0].BRAND,
       },
       {
-        SIZE: size ? size : offer.product_details.size,
+        SIZE: size ? size : offer.product_details[1].SIZE,
       },
       {
-        CONDITION: condition ? condition : offer.product_details.condition,
+        CONDITION: condition ? condition : offer.product_details[2].CONDITION,
       },
       {
-        COLOR: color ? color : offer.product_details.color,
+        COLOR: color ? color : offer.product_details[3].COLOR,
       },
       {
-        CITY: city ? city : offer.product_details.city,
+        CITY: city ? city : offer.product_details[4].CITY,
       },
     ];
     await offer.save();

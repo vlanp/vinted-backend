@@ -6,8 +6,8 @@ const {
   passwordValidation,
   emailValidation,
   newsletterValidation,
-  pictureValidation,
 } = require("../middlewares/user");
+const { pictureValidation } = require("../middlewares/picture");
 const fileUpload = require("express-fileupload");
 const User = require("../models/User");
 const uid2 = require("uid2");
@@ -78,7 +78,8 @@ router.post(
       const response = {
         _id: newUser._id,
         token: token,
-        account: { username: username },
+        newsletter: newsletter,
+        account: newUser.account,
       };
 
       res.status(201).json(response);
@@ -117,7 +118,8 @@ router.post("/login", emailValidation, passwordValidation, async (req, res) => {
     const response = {
       _id: _id,
       token: token,
-      account: { username: user.account.username },
+      newsletter: user.newsletter,
+      account: user.account,
     };
 
     res.status(200).json(response);
