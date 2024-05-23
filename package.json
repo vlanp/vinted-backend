@@ -15,6 +15,7 @@
     "express": "^4.19.2",
     "express-fileupload": "^1.5.0",
     "mongoose": "^8.4.0",
+    "nodemailer": "^6.9.13",
     "uid2": "^1.0.0",
     "validator": "^13.12.0"
   }

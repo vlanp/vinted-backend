@@ -11,11 +11,11 @@ const usernameValidation = (req, res, next) => {
       };
     }
 
-    if (username.length < 3 || username.length > 16) {
+    if (username.length < 2 || username.length > 16) {
       throw {
         status: 406,
         message:
-          "Incorrect username. Your username must have between 5 and 16 characters.",
+          "Incorrect username. Your username must have between 2 and 16 characters.",
       };
     }
 

@@ -1,7 +1,7 @@
 const User = require("../models/User");
 
 /**
- * Return next() if the parameter req contains a Bearer token in req.headers.authorization and if this token correspond to a user in the database.
+ * Return next() if the parameter req contains a Bearer token in req.headers.authorization and this token correspond to a user in the database and this user has verified his email address.
  * Use as a middleware with express package, next() make the code continue to the next middleware.
  * The user found in the database is added to req.user and can be access in the next middleware.
  * Return undefined if there is no valid Bearer token in the req, and respond to the client.
@@ -20,13 +20,20 @@ const isAuthentificated = async (req, res, next) => {
     const token = req.headers.authorization.replace("Bearer ", "");
     const user = await User.findOne({
       token: token,
-    }).select("account");
+    }).select("account active");
 
     if (!user) {
       throw { status: 401, message: "Unauthorized access" };
     }
 
-    req.user = user;
+    if (!user.active) {
+      throw {
+        status: 401,
+        message: "Unauthorized access. Email address must be verified !",
+      };
+    }
+
+    req.user = user.select("account");
     return next();
   } catch (error) {
     res
