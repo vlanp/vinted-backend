@@ -19,6 +19,6 @@ app.all("*", (req, res) => {
   res.status(404).json({ message: "This route doesn't exist" });
 });
 
-app.listen(process.env.MONGODB_PORT, () => {
+app.listen(process.env.PORT, () => {
   console.log("Server started");
 });
