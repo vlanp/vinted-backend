@@ -1,13 +1,8 @@
-const {
-  cloudinaryCloudName,
-  cloudinaryApiKey,
-  cloudinaryApiSecret,
-} = require("../config");
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
-  cloud_name: cloudinaryCloudName,
-  api_key: cloudinaryApiKey,
-  api_secret: cloudinaryApiSecret,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: CLOUDINARY_API_KEY,
+  api_secret: CLOUDINARY_API_SECRET,
 });
 
 const uploadPicture = (picture, folder = null, needConversion = true) => {
