@@ -121,21 +121,13 @@ router.put(
         offer.product_image = pictureDataObj;
       }
       offer.product_details = [
-        {
-          BRAND: brand ? brand : offer.product_details[0].BRAND,
-        },
-        {
-          SIZE: size ? size : offer.product_details[1].SIZE,
-        },
+        { BRAND: brand ? brand : offer.product_details[0].BRAND },
+        { SIZE: size ? size : offer.product_details[1].SIZE },
         {
           CONDITION: condition ? condition : offer.product_details[2].CONDITION,
         },
-        {
-          COLOR: color ? color : offer.product_details[3].COLOR,
-        },
-        {
-          CITY: city ? city : offer.product_details[4].CITY,
-        },
+        { COLOR: color ? color : offer.product_details[3].COLOR },
+        { CITY: city ? city : offer.product_details[4].CITY },
       ];
       await offer.save();
       res.status(201).json(offer);
@@ -212,16 +204,17 @@ router.get("/offers", async (req, res) => {
       [priceMin, priceMax] = [priceMax, priceMin];
     }
 
-    const offerList = await Offer.find({
-      product_name: new RegExp(title ? title : undefined, "i"),
-      product_price: {
-        $gte: priceMin ? priceMin : 0,
-        $lte: priceMax ? priceMax : Infinity,
-      },
-    })
-      .sort({ product_price: sort ? sort : null })
+    const filter = {};
+    isTitleValid ? (filter.product_name = new RegExp(title, "i")) : null;
+    filter.product_price = {
+      $gte: isPriceMinValid ? priceMin : 0,
+      $lte: isPriceMaxValid ? priceMax : Infinity,
+    };
+
+    const offerList = await Offer.find(filter)
+      .sort(isSortValid ? { product_price: sort } : {})
       .limit(5)
-      .skip(page ? (page - 1) * 5 : 0)
+      .skip(isPageValid ? (page - 1) * 5 : 0)
       .populate("owner", "account.username account.avatar.secure_url")
       .select(
         "product_details product_image.secure_url product_name product_description product_price"
