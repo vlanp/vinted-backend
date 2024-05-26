@@ -40,7 +40,7 @@ router.post(
 
       const randomString = uid2(128);
 
-      const emailResponse = await sendEmail(
+      await sendEmail(
         email,
         "Email verification for Vinted replica website",
         "Please click on the link below to activate your account : \nhttp://localhost:3000/user/mailcheck/" +

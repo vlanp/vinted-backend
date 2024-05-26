@@ -73,7 +73,7 @@ const priceValidation = (
   try {
     const price = Number(req[parametersType][parametersName]);
 
-    if (typeof price !== "number") {
+    if (typeof price !== "number" || Number.isNaN(price)) {
       throw {
         status: 406,
         message: "Incorrect price. Please enter a price.",
