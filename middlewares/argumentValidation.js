@@ -1,5 +1,18 @@
 const validator = require("validator");
 
+/**
+ * Return **next()** or **undefined** when use as a **middleware** and return **true** or **undefined** otherwise.
+ *
+ * With express **next()** make the code continue to the next middleware.
+ *
+ * @param parameterType **Mandatory parameter**. Must represent the key in which the argument is stored (**eg: body, params, query, files...**)
+ * @param argumentName **Mandatory parameter**. Must represent the name of the argument stored in **req[***parameterType***]**
+ * @param argumentType **Mandatory parameter**. Must represent the type (**ie: string, number, picture or boolean**) for which the argument will be validate
+ * @param stringOption **Optional parameter**. Allow to add some options when ***argumentType***=**string**
+ * @param numberOption **Optional parameter**. Allow to add some options when ***argumentType***=**number**
+ * @param isMiddleware **Optional parameter**. Must be set to **false** when the funtion is not used as a middleware
+ * @return **next()** or **true** or **undefined**
+ */
 const isArgumentValid = ({
   parameterType,
   argumentName,
