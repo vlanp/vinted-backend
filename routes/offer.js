@@ -4,23 +4,44 @@ const { isAuthentificated } = require("../middlewares/authentification");
 const Offer = require("../models/Offer");
 const fileUpload = require("express-fileupload");
 const { uploadPicture, deletePicture } = require("../utils/cloudinary");
-const {
-  titleValidation,
-  descriptionValidation,
-  priceValidation,
-  sortValidation,
-  pageValidation,
-} = require("../middlewares/offer");
-const { pictureValidation } = require("../middlewares/picture");
+const { isArgumentValid } = require("../middlewares/argumentValidation");
 
 router.post(
   "/offer/publish",
   isAuthentificated,
   fileUpload(),
-  titleValidation,
-  descriptionValidation,
-  priceValidation,
-  pictureValidation,
+  isArgumentValid({
+    parameterType: "body",
+    argumentType: "string",
+    argumentName: "title",
+    stringOption: {
+      argumentMinLength: 2,
+      argumentMaxLength: 50,
+    },
+  }),
+  isArgumentValid({
+    parameterType: "body",
+    argumentType: "string",
+    argumentName: "description",
+    stringOption: {
+      argumentMinLength: 2,
+      argumentMaxLength: 500,
+    },
+  }),
+  isArgumentValid({
+    parameterType: "body",
+    argumentType: "number",
+    argumentName: "price",
+    numberOption: {
+      argumentMinValue: 1,
+      argumentMaxValue: 100_000,
+    },
+  }),
+  isArgumentValid({
+    parameterType: "files",
+    argumentName: "picture",
+    argumentType: "picture",
+  }),
   async (req, res) => {
     try {
       const { title, description, price, condition, city, brand, size, color } =
@@ -96,21 +117,55 @@ router.put(
         };
       }
 
+      const isTitleValidFunction = isArgumentValid({
+        parameterType: "body",
+        argumentType: "string",
+        argumentName: "title",
+        stringOption: {
+          argumentMinLength: 2,
+          argumentMaxLength: 50,
+        },
+        isMiddleware: false,
+      });
+      const isTitleValid = isTitleValidFunction(req, res);
+
+      const isDescriptionValidFunction = isArgumentValid({
+        parameterType: "body",
+        argumentType: "string",
+        argumentName: "description",
+        stringOption: {
+          argumentMinLength: 2,
+          argumentMaxLength: 500,
+        },
+        isMiddleware: false,
+      });
+      const isDescriptionValid = isDescriptionValidFunction(req, res);
+
+      const isPriceValidFunction = isArgumentValid({
+        parameterType: "body",
+        argumentName: "price",
+        argumentType: "number",
+        numberOption: {
+          argumentMinValue: 0,
+          argumentMaxValue: 100_000,
+        },
+        isMiddleware: false,
+      });
+      const isPriceValid = isPriceValidFunction(req, res);
+
+      const isPictureValidFunction = isArgumentValid({
+        parameterType: "files",
+        argumentName: "picture",
+        argumentType: "picture",
+        isMiddleware: false,
+      });
+      const isPictureValid = isPictureValidFunction(req, res);
+
       const { title, description, price, condition, city, brand, size, color } =
         req.body;
 
-      if (titleValidation(req)) {
-        offer.product_name = title;
-      }
-      if (descriptionValidation(req)) {
-        offer.product_description = description;
-      }
-      if (priceValidation(req)) {
-        offer.product_price = price;
-      }
-      pictureValidation(req);
-      const { picture } = req.files;
-      if (picture) {
+      if (isPictureValid) {
+        const { picture } = req.files;
         if (offer.product_image) {
           const publicId = offer.product_image.public_id;
           const folder = offer.product_image.folder;
@@ -120,6 +175,10 @@ router.put(
         const pictureDataObj = await uploadPicture(picture, folder);
         offer.product_image = pictureDataObj;
       }
+
+      isTitleValid ? (offer.product_name = title) : null;
+      isDescriptionValid ? (offer.product_description = description) : null;
+      isPriceValid ? (offer.product_price = price) : null;
       offer.product_details = [
         { BRAND: brand ? brand : offer.product_details[0].BRAND },
         { SIZE: size ? size : offer.product_details[1].SIZE },
@@ -129,7 +188,9 @@ router.put(
         { COLOR: color ? color : offer.product_details[3].COLOR },
         { CITY: city ? city : offer.product_details[4].CITY },
       ];
+
       await offer.save();
+
       res.status(201).json(offer);
     } catch (error) {
       res
@@ -177,25 +238,60 @@ router.delete("/offer/delete/:id", isAuthentificated, async (req, res) => {
 
 router.get("/offers", async (req, res) => {
   try {
-    const isTitleValid = titleValidation(req, undefined, undefined, "query");
-    const isPriceMinValid = priceValidation(
-      req,
-      undefined,
-      undefined,
-      "query",
-      "priceMin"
-    );
-    const isPriceMaxValid = priceValidation(
-      req,
-      undefined,
-      undefined,
-      "query",
-      "priceMax"
-    );
+    const isTitleValidFunction = isArgumentValid({
+      parameterType: "query",
+      argumentName: "title",
+      argumentType: "string",
+      isMiddleware: false,
+    });
+    const isTitleValid = isTitleValidFunction(req, res);
 
-    const isSortValid = sortValidation(req);
+    const isPriceMinValidFunction = isArgumentValid({
+      parameterType: "query",
+      argumentName: "priceMin",
+      argumentType: "number",
+      numberOption: {
+        argumentMinValue: 0,
+        argumentMaxValue: 100_000,
+      },
+      isMiddleware: false,
+    });
+    const isPriceMinValid = isPriceMinValidFunction(req, res);
 
-    const isPageValid = pageValidation(req);
+    const isPriceMaxValidFunction = isArgumentValid({
+      parameterType: "query",
+      argumentName: "priceMax",
+      argumentType: "number",
+      numberOption: {
+        argumentMinValue: 0,
+        argumentMaxValue: 100_000,
+      },
+      isMiddleware: false,
+    });
+    const isPriceMaxValid = isPriceMaxValidFunction(req, res);
+
+    const isSortValidFunction = isArgumentValid({
+      parameterType: "query",
+      argumentName: "sort",
+      argumentType: "string",
+      stringOption: {
+        argumentTransformObj: { "price-asc": 1, "price-desc": -1 },
+      },
+      isMiddleware: false,
+    });
+    const isSortValid = isSortValidFunction(req, res);
+
+    const isPageValidFunction = isArgumentValid({
+      parameterType: "query",
+      argumentName: "page",
+      argumentType: "number",
+      numberOption: {
+        argumentMinValue: 1,
+        mustBeInteger: true,
+      },
+      isMiddleware: false,
+    });
+    const isPageValid = isPageValidFunction(req, res);
 
     const { title, sort, page } = req.query;
     let { priceMin, priceMax } = req.query;
@@ -222,7 +318,7 @@ router.get("/offers", async (req, res) => {
 
     const count = offerList.length;
 
-    res.status(201).json({
+    res.status(200).json({
       count: count,
       offers: offerList,
     });
