@@ -73,11 +73,30 @@ router.post(
 
       const { picture } = req.files;
 
-      if (picture) {
-        const folder = "/vinted/offers/" + newOffer._id;
-        const pictureDataObj = await uploadPicture(picture, folder);
-        newOffer.product_image = pictureDataObj;
-      }
+      const isPictureListValidFunction = isArgumentValid({
+        parameterType: "files",
+        argumentName: "pictures",
+        argumentType: "picture",
+        isMiddleware: false,
+      });
+      const isPictureListValid = isPictureListValidFunction(req, res);
+
+      const pictureList = isPictureListValid ? req.files.pictures : [];
+
+      pictureList.unshift(picture);
+
+      const folder = "/vinted/offers/" + newOffer._id;
+
+      const promiseArray = pictureList.map((picture) => {
+        return uploadPicture(picture, folder);
+      });
+
+      const uploadResultList = await Promise.all(promiseArray);
+
+      const pictureDataObj = uploadResultList.shift();
+      newOffer.product_image = pictureDataObj;
+
+      newOffer.product_pictures = uploadResultList;
 
       await newOffer.save();
 
@@ -161,20 +180,40 @@ router.put(
       });
       const isPictureValid = isPictureValidFunction(req, res);
 
+      const isPictureListValidFunction = isArgumentValid({
+        parameterType: "files",
+        argumentName: "pictures",
+        argumentType: "picture",
+        isMiddleware: false,
+      });
+      const isPictureListValid = isPictureListValidFunction(req, res);
+
       const { title, description, price, condition, city, brand, size, color } =
         req.body;
 
-      if (isPictureValid) {
-        const { picture } = req.files;
-        if (offer.product_image) {
-          const publicId = offer.product_image.public_id;
-          const folder = offer.product_image.folder;
-          await deletePicture(publicId, folder);
-        }
-        const folder = "/vinted/offers/" + offer._id;
-        const pictureDataObj = await uploadPicture(picture, folder);
-        offer.product_image = pictureDataObj;
-      }
+      const pictureList = isPictureListValid ? req.files.pictures : [];
+      const picture = isPictureValid ? req.files.picture : undefined;
+      const publicId =
+        isPictureValid && offer.product_image
+          ? offer.product_image.public_id
+          : undefined;
+
+      isPictureValid ? pictureList.unshift(picture) : null;
+
+      const folder = "/vinted/offers/" + offer._id;
+
+      const promiseArray = pictureList.map((picture) => {
+        return uploadPicture(picture, folder);
+      });
+
+      publicId ? promiseArray.push(deletePicture(publicId, folder)) : null;
+
+      const resultList = await Promise.all(promiseArray);
+
+      const pictureDataObj = isPictureValid ? resultList.shift() : undefined;
+      isPictureValid ? (offer.product_image = pictureDataObj) : null;
+
+      isPictureListValid ? (offer.product_pictures = resultList) : null;
 
       isTitleValid ? (offer.product_name = title) : null;
       isDescriptionValid ? (offer.product_description = description) : null;

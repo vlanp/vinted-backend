@@ -33,7 +33,8 @@ const isAuthentificated = async (req, res, next) => {
       };
     }
 
-    req.user = user.select("account");
+    req.user = user;
+
     return next();
   } catch (error) {
     res

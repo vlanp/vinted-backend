@@ -22,7 +22,7 @@ const isArgumentValid = ({
     argumentMaxLength: undefined,
     mustBeStrongPassword: undefined,
     mustBeEmail: undefined,
-    argumentTransformObj: {},
+    argumentTransformObj: undefined,
   },
   numberOption = {
     argumentMinValue: undefined,
@@ -81,7 +81,7 @@ const isArgumentValid = ({
 
       if (
         stringOption.mustBeStrongPassword
-          ? !validator.isStrongPassword(password)
+          ? !validator.isStrongPassword(argument)
           : false
       ) {
         throw {
@@ -91,14 +91,16 @@ const isArgumentValid = ({
         };
       }
 
-      if (stringOption.mustBeEmail ? !validator.isEmail(email) : false) {
+      if (stringOption.mustBeEmail ? !validator.isEmail(argument) : false) {
         throw {
           status: 406,
           message: "Incorrect email. Please enter a valid email.",
         };
       }
 
-      const keyList = Object.keys(stringOption.argumentTransformObj);
+      const keyList = stringOption.argumentTransformObj
+        ? Object.keys(stringOption.argumentTransformObj)
+        : [];
       if (keyList.length !== 0) {
         if (!keyList.includes(argument)) {
           throw {
@@ -194,18 +196,31 @@ const isArgumentValid = ({
   const isPicture = (req, res, next) => {
     try {
       if (req[parameterType]) {
-        const picture = req.files[argumentName];
-        if (!picture) {
-          throw {
-            status: 400,
-            message: "No picture found",
-          };
-        }
-        if (!picture.mimetype || !picture.data) {
-          throw {
-            status: 406,
-            message: "Incorrect picture. The pricture has a wrong format.",
-          };
+        if (!Array.isArray(req.files[argumentName])) {
+          const picture = req.files[argumentName];
+          if (!picture || !picture.mimetype || !picture.data) {
+            throw {
+              status: 400,
+              message: "No picture found",
+            };
+          }
+        } else {
+          const pictureList = req.files[argumentName];
+
+          for (let i = 0; i <= pictureList.length - 1; i++) {
+            const picture = pictureList[i];
+            if (!picture || !picture.mimetype || !picture.data) {
+              pictureList.splice(i, 1);
+              i--;
+            }
+          }
+
+          if (pictureList.length === 0) {
+            throw {
+              status: 400,
+              message: "No picture found",
+            };
+          }
         }
       } else {
         throw {
