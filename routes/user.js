@@ -56,7 +56,9 @@ router.post(
       await sendEmail(
         email,
         "Email verification for Vinted replica website",
-        "Please click on the link below to activate your account : \nhttp://localhost:3000/user/mailcheck/" +
+        "Please click on the link below to activate your account : \n" +
+          "https://site--backend-vinted--x7c7hl9cnzx6.code.run/" +
+          "/user/mailcheck/" +
           randomString
       );
 
