@@ -198,4 +198,108 @@ router.get("/mailcheck/:randomString", async (req, res) => {
   }
 });
 
+router.get("/account", async (req, res) => {
+  try {
+    if (!req.headers || !req.headers.authorization) {
+      throw { status: 401, message: "Unauthorized access" };
+    }
+
+    const token = req.headers.authorization.replace("Bearer ", "");
+    const user = await User.findOne({
+      token: token,
+    });
+
+    if (!user) {
+      throw { status: 404, message: "No user found with this token" };
+    }
+
+    res.status(200).json({
+      username: user.account.username,
+      avatar: user.account.avatar?.secure_url,
+      email: user.email,
+      active: user.active,
+      newsletter: user.newsletter,
+    });
+  } catch (error) {
+    res
+      .status(error.status || 500)
+      .json({ message: error.message || "Internal server error" });
+  }
+});
+
+router.patch("/account", fileUpload(), async (req, res) => {
+  try {
+    if (!req.headers || !req.headers.authorization) {
+      throw { status: 401, message: "Unauthorized access" };
+    }
+
+    const token = req.headers.authorization.replace("Bearer ", "");
+    const user = await User.findOne({
+      token: token,
+    });
+
+    if (!user) {
+      throw { status: 404, message: "No user found with this token" };
+    }
+
+    const { newsletter, username } = req.body;
+
+    const isUsernameValidFunction = isArgumentValid({
+      parameterType: "body",
+      argumentName: "username",
+      argumentType: "string",
+      isMiddleware: false,
+      stringOption: {
+        argumentMinLength: 2,
+      },
+    });
+    const isUsernameValid = isUsernameValidFunction(req, res);
+
+    const isNewsletterValidFunction = isArgumentValid({
+      parameterType: "body",
+      argumentName: "newsletter",
+      argumentType: "boolean",
+      isMiddleware: false,
+    });
+    const isNewsletterValid = isNewsletterValidFunction(req, res);
+
+    const isPictureValidFunction = isArgumentValid({
+      parameterType: "files",
+      argumentName: "picture",
+      argumentType: "picture",
+      isMiddleware: false,
+    });
+    const isPictureValid = isPictureValidFunction(req, res);
+
+    if (isUsernameValid) {
+      user.account.username = username;
+    }
+
+    if (isNewsletterValid) {
+      user.newsletter = newsletter;
+    }
+
+    if (isPictureValid) {
+      const { picture } = req.files;
+      const folder = "/vinted/user/" + user._id;
+      const pictureDataObj = await uploadPicture(picture, folder);
+      user.account.avatar = pictureDataObj;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      username: user.account.username,
+      avatar: user.account.avatar?.secure_url,
+      email: user.email,
+      active: user.active,
+      newsletter: user.newsletter,
+    });
+  } catch (error) {
+    res
+      .status(error.status || 500)
+      .json({ message: error.message || "Internal server error" });
+  }
+});
+
 module.exports = router;

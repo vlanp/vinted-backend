@@ -131,6 +131,8 @@ const isArgumentValid = ({
     try {
       const argument = Number(req[parameterType][argumentName]);
 
+      console.log(argument);
+
       if (typeof argument !== "number" || Number.isNaN(argument)) {
         throw {
           status: 406,
@@ -240,7 +242,7 @@ const isArgumentValid = ({
 
   const isBoolean = (req, res, next) => {
     try {
-      const argument = req[parameterType][argumentName];
+      let argument = req[parameterType][argumentName];
       const allowedArgumentList = [
         0,
         1,

@@ -44,8 +44,16 @@ router.post(
   }),
   async (req, res) => {
     try {
-      const { title, description, price, condition, city, brand, size, color } =
-        req.body;
+      const {
+        title,
+        description,
+        price,
+        condition,
+        location,
+        brand,
+        size,
+        color,
+      } = req.body;
 
       const newOffer = new Offer({
         product_name: title,
@@ -53,19 +61,19 @@ router.post(
         product_price: price,
         product_details: [
           {
-            BRAND: brand,
+            MARQUE: brand,
           },
           {
-            SIZE: size,
+            TAILLE: size,
           },
           {
-            CONDITION: condition,
+            ÉTAT: condition,
           },
           {
-            COLOR: color,
+            COULEUR: color,
           },
           {
-            CITY: city,
+            EMPLACEMENT: location,
           },
         ],
         owner: req.user,
@@ -291,7 +299,7 @@ router.get("/offers", async (req, res) => {
       argumentType: "number",
       numberOption: {
         argumentMinValue: 0,
-        argumentMaxValue: 100_000,
+        argumentMaxValue: Infinity,
       },
       isMiddleware: false,
     });
@@ -303,7 +311,7 @@ router.get("/offers", async (req, res) => {
       argumentType: "number",
       numberOption: {
         argumentMinValue: 0,
-        argumentMaxValue: 100_000,
+        argumentMaxValue: Infinity,
       },
       isMiddleware: false,
     });
