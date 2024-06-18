@@ -57,7 +57,7 @@ router.post(
         email,
         "Email verification for Vinted replica website",
         "Please click on the link below to activate your account : \n" +
-          "https://site--backend-vinted--x7c7hl9cnzx6.code.run/" +
+          "https://site--backend-vinted--x7c7hl9cnzx6.code.run" +
           "/user/mailcheck/" +
           randomString
       );
