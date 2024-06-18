@@ -317,6 +317,19 @@ router.get("/offers", async (req, res) => {
     });
     const isPriceMaxValid = isPriceMaxValidFunction(req, res);
 
+    const isLimitValidFunction = isArgumentValid({
+      parameterType: "query",
+      argumentName: "limit",
+      argumentType: "number",
+      numberOption: {
+        argumentMinValue: 0,
+        argumentMaxValue: Infinity,
+        mustBeInteger: true,
+      },
+      isMiddleware: false,
+    });
+    const isLimitValid = isLimitValidFunction(req, res);
+
     const isSortValidFunction = isArgumentValid({
       parameterType: "query",
       argumentName: "sort",
@@ -340,7 +353,7 @@ router.get("/offers", async (req, res) => {
     });
     const isPageValid = isPageValidFunction(req, res);
 
-    const { title, sort, page } = req.query;
+    const { title, sort, page, limit } = req.query;
     let { priceMin, priceMax } = req.query;
 
     if (isPriceMinValid && isPriceMaxValid && priceMin > priceMax) {
@@ -356,7 +369,7 @@ router.get("/offers", async (req, res) => {
 
     const offerList = await Offer.find(filter)
       .sort(isSortValid ? { product_price: sort } : {})
-      .limit(5)
+      .limit(isLimitValid ? limit : 20)
       .skip(isPageValid ? (page - 1) * 5 : 0)
       .populate("owner", "account.username account.avatar.secure_url")
       .select(
