@@ -370,7 +370,7 @@ router.get("/offers", async (req, res) => {
     const offerList = await Offer.find(filter)
       .sort(isSortValid ? { product_price: sort } : {})
       .limit(isLimitValid ? limit : 20)
-      .skip(isPageValid ? (page - 1) * 5 : 0)
+      .skip(isPageValid ? (page - 1) * (isLimitValid ? limit : 20) : 0)
       .populate("owner", "account.username account.avatar.secure_url")
       .select(
         "product_details product_image.secure_url product_name product_description product_price"
