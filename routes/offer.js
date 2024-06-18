@@ -376,7 +376,9 @@ router.get("/offers", async (req, res) => {
         "product_details product_image.secure_url product_name product_description product_price"
       );
 
-    const count = offerList.length;
+    const allOfferList = await Offer.find();
+
+    const count = allOfferList.length;
 
     res.status(200).json({
       count: count,
