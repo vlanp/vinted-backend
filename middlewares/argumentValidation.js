@@ -33,7 +33,7 @@ const isArgumentValid = ({
 }) => {
   const isString = (req, res, next) => {
     try {
-      log(req);
+      console.log(req);
       let argument = req[parameterType][argumentName];
 
       console.log(argument);
