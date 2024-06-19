@@ -35,6 +35,8 @@ const isArgumentValid = ({
     try {
       let argument = req[parameterType][argumentName];
 
+      console.log(argument);
+
       if (typeof argument !== "string") {
         throw {
           status: 406,
