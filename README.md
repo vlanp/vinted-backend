@@ -36,7 +36,7 @@
   <p align="center">
 API for a <a href="https://www.vinted.fr">Vinted</a> replica website, built in 2024 during a bootcamp at <a href="https://www.lereacteur.io/">Le Reacteur</a>.
     <br />
-    <a href="https://github.com/vlanp/vinted-backend"><strong>Explore the docs</strong></a>
+    <a href="https://portfolio-v2-puce-ten.vercel.app/projects/68896865718a051c3e2a6742"><strong>Explore the docs</strong></a>
     <br />
     <br />
     <a href="https://github.com/vlanp/vinted-backend/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
