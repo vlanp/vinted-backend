@@ -57,6 +57,7 @@ It is a REST API developed with Node.js and Express, based on a MongoDB database
 - [![Express][Express]][Express-url]
 - [![Mongoose][Mongoose]][Mongoose-url]
 - [![Stripe][Stripe]][Stripe-url]
+- [![Node.js][Node.js]][Node.js-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -104,3 +105,5 @@ Project Link: [https://github.com/vlanp/vinted-backend](https://github.com/vlanp
 [Cloudinary-url]: https://cloudinary.com/
 [Express]: https://img.shields.io/badge/Express-000?logo=express&logoColor=fff&style=for-the-badge
 [Express-url]: https://expressjs.com/
+[Node.js]: https://img.shields.io/badge/Node.js-5FA04E?logo=nodedotjs&logoColor=fff&style=for-the-badge
+[Node.js-url]: https://nodejs.org/fr
