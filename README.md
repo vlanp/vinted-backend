@@ -77,6 +77,8 @@ Valentin GUILLAUME - vguillaumedev@gmail.com
 
 Project Link: [https://github.com/vlanp/vinted-backend](https://github.com/vlanp/vinted-backend)
 
+Routes description: [https://documenter.getpostman.com/view/34963907/2sB3BANDNo](https://documenter.getpostman.com/view/34963907/2sB3BANDNo)
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
