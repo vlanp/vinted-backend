@@ -25,7 +25,7 @@ router.post(
 
       if (!offer) {
         throw {
-          error: 404,
+          status: 404,
           message: "No offer were find with the id : " + offerId,
         };
       }

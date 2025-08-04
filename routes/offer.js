@@ -132,14 +132,14 @@ router.put(
 
       if (!offer) {
         throw {
-          error: 404,
+          status: 404,
           message: "No offer were find with the id : " + offerId,
         };
       }
 
       if (req.user._id.valueOf() !== offer.owner._id.valueOf()) {
         throw {
-          error: 401,
+          status: 401,
           message: "You are not the owner of the offer. You can't modify it.",
         };
       }
@@ -255,14 +255,14 @@ router.delete("/offer/delete/:id", isAuthentificated, async (req, res) => {
 
     if (!offer) {
       throw {
-        error: 404,
+        status: 404,
         message: "No offer were find with the id : " + offerId,
       };
     }
 
     if (req.user._id.valueOf() !== offer.owner.valueOf()) {
       throw {
-        error: 401,
+        status: 401,
         message: "You are not the owner of the offer. You can't modify it.",
       };
     }
@@ -403,7 +403,7 @@ router.get("/offers/:id", async (req, res) => {
 
     if (!offer) {
       throw {
-        error: 404,
+        status: 404,
         message: "No offer were find with the id : " + offerId,
       };
     }
