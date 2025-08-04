@@ -227,13 +227,13 @@ router.put(
       isDescriptionValid ? (offer.product_description = description) : null;
       isPriceValid ? (offer.product_price = price) : null;
       offer.product_details = [
-        { BRAND: brand ? brand : offer.product_details[0].BRAND },
-        { SIZE: size ? size : offer.product_details[1].SIZE },
+        { MARQUE: brand ? brand : offer.product_details[0].MARQUE },
+        { TAILLE: size ? size : offer.product_details[1].TAILLE },
         {
-          CONDITION: condition ? condition : offer.product_details[2].CONDITION,
+          ÉTAT: condition ? condition : offer.product_details[2].ÉTAT,
         },
-        { COLOR: color ? color : offer.product_details[3].COLOR },
-        { CITY: city ? city : offer.product_details[4].CITY },
+        { COULEUR: color ? color : offer.product_details[3].COULEUR },
+        { EMPLACEMENT: city ? city : offer.product_details[4].EMPLACEMENT },
       ];
 
       await offer.save();
