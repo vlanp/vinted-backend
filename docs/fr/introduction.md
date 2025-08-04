@@ -9,4 +9,6 @@ Cette API permet la persistance des données grâce à MongoDB et Cloudinary, et
 
 L'API est déployée sur [Northflank](https://app.northflank.com/) et est accessible [ici](https://site--backend-vinted--x7c7hl9cnzx6.code.run).
 
-<iframe width="560" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+Le descriptif des routes de l'API est disponible [ici](https://documenter.getpostman.com/view/34963907/2sB3BANDNo).
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/vnJVjyOwq8M?si=EPtLDU95PtOsmNRv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
